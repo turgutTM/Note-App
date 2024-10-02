@@ -8,6 +8,7 @@ import { FaBoxArchive } from "react-icons/fa6";
 import { BsThreeDots } from "react-icons/bs";
 import { FaRegFolder } from "react-icons/fa6";
 import { IoCloseSharp } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,9 +26,30 @@ const NotesPage = ({ setSelectedComponent }) => {
   const [folders, setFolders] = useState([]);
   const [foldersDot, setFoldersDot] = useState([]);
   const [activeNoteId, setActiveNoteId] = useState(null);
+  const [activeTab, setActiveTab] = useState("");
   const router = useRouter();
 
   const user = useSelector((state) => state.user.user);
+
+  const filterNotesByDate = () => {
+    const now = new Date();
+    if (activeTab === "today") {
+      return notes.filter(
+        (note) => new Date(note.createdAt).toDateString() === now.toDateString()
+      );
+    } else if (activeTab === "week") {
+      const weekAgo = new Date();
+      weekAgo.setDate(now.getDate() - 7);
+      return notes.filter((note) => new Date(note.createdAt) >= weekAgo);
+    } else if (activeTab === "month") {
+      const monthAgo = new Date();
+      monthAgo.setMonth(now.getMonth() - 1);
+      return notes.filter((note) => new Date(note.createdAt) >= monthAgo);
+    }
+    return notes;
+  };
+
+  const filteredNotes = filterNotesByDate();
 
   const fetchNotes = async () => {
     try {
@@ -203,21 +225,20 @@ const NotesPage = ({ setSelectedComponent }) => {
 
   const handleAddToFolder = async (noteId, folderId) => {
     try {
-      const response = await fetch("/api/add-note-folder", {
+      const res = await fetch("/api/add-note-folder", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ noteId, folderId }),
       });
 
-      if (response.ok) {
-        console.log("Note added to folder successfully");
-      } else {
-        console.error("Failed to add note to folder");
+      if (res.status === 400) {
+        const message = await res.text();
+        toast.error(message);
+      } else if (res.status === 200) {
+        fetchNotes();
+        toast.success("Note added to folder successfully");
       }
     } catch (error) {
-      console.error("Error adding note to folder:", error);
+      toast.error("An error occurred");
     }
   };
 
@@ -251,12 +272,13 @@ const NotesPage = ({ setSelectedComponent }) => {
         <div>
           <p className="font-semibold text-2xl">Recent Folders</p>
         </div>
-        <div className="flex font-semibold text-gray-400 gap-14">
-          <p>Today's</p>
-          <p>This week</p>
-          <p>This Month</p>
-        </div>
-        <div className="flex gap-8 mt-4 items-center overflow-x-auto scrollbar-hide">
+        <div
+          className={`flex gap-8 mt-4 items-center overflow-x-auto scrollbar-hide  ${
+            folders.length > 3
+              ? "w-[57rem] overflow-x-auto scrollbar-hide"
+              : "max-w-fit"
+          }`}
+        >
           {folders.map((folder) => (
             <Link href={`/folder/${folder._id}`} key={folder._id}>
               <div className="w-[10rem] h-[10rem] relative flex flex-col items-center justify-center bg-yellow-100 border-2 border-gray-300 rounded-xl hover:shadow-lg cursor-pointer">
@@ -271,9 +293,7 @@ const NotesPage = ({ setSelectedComponent }) => {
                 </div>
                 <div className="flex flex-col items-center">
                   <FaFolder className="text-5xl text-yellow-600 mb-3" />
-                  <p className="font-semibold text-center">
-                    {folder.folderName}
-                  </p>
+                  <p className=" text-center">{folder.folderName}</p>
                 </div>
               </div>
             </Link>
@@ -283,7 +303,7 @@ const NotesPage = ({ setSelectedComponent }) => {
             className="w-[10rem] h-[10rem] flex flex-col items-center justify-center bg-gray-100 border-2 border-gray-300 rounded-xl hover:shadow-lg cursor-pointer"
             onClick={() => setFolderModalOpen(true)}
           >
-            <FaFolder className="text-5xl text-gray-400 mb-3" />
+            <FaFolder className="text-5xl  text-gray-400 mb-3" />
             <p className="font-semibold text-gray-500">New Folder</p>
           </div>
         </div>
@@ -293,8 +313,28 @@ const NotesPage = ({ setSelectedComponent }) => {
         <div>
           <p className="font-semibold text-2xl">Recent Notes</p>
         </div>
+        <div className="flex font-semibold text-gray-400 gap-14">
+          <p
+            onClick={() => setActiveTab("today")}
+            className={activeTab === "today" ? "text-black cursor-pointer" : "cursor-pointer"}
+          >
+            Today's
+          </p>
+          <p
+            onClick={() => setActiveTab("week")}
+            className={activeTab === "week" ? "text-black cursor-pointer" : "cursor-pointer"}
+          >
+            This Week
+          </p>
+          <p
+            onClick={() => setActiveTab("month")}
+            className={activeTab === "month" ? "text-black cursor-pointer" : "cursor-pointer"}
+          >
+            This Month
+          </p>
+        </div>
         <div className="grid grid-cols-3 gap-8 mt-4">
-          {notes.slice(0, 3).map((note) => (
+          {filteredNotes.slice(0, 3).map((note) => (
             <div
               key={note._id}
               onClick={() => handleViewNote(note)}
@@ -305,7 +345,7 @@ const NotesPage = ({ setSelectedComponent }) => {
                   {new Date(note.createdAt).toLocaleDateString()}
                 </p>
                 {note.folderName && (
-                  <div className="text-white bg-blue-500 pl-2 pr-2 rounded-full text-sm">
+                  <div className="text-black border bg-white border-[#494848]  pl-2 pr-2 pb-1 rounded-full text-sm">
                     {note.folderName}
                   </div>
                 )}
@@ -334,7 +374,13 @@ const NotesPage = ({ setSelectedComponent }) => {
                     className="text-red-600 hover:scale-110 duration-150 cursor-pointer"
                   />
                   {activeNoteId === note._id && (
-                    <div className="absolute right-0 z-10 w-64 top-9 mr-8 bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden">
+                    <div
+                      className={`absolute right-0 z-10 w-64 top-10 mr-8 bg-white border border-gray-300 rounded-md shadow-lg ${
+                        foldersDot.length > 3
+                          ? "max-h-36 overflow-y-auto scrollbar-hide"
+                          : "max-h-fit"
+                      }`}
+                    >
                       {foldersDot.map((folderDot) => (
                         <div
                           key={folderDot._id}

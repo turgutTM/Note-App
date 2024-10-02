@@ -6,19 +6,15 @@ import { useSelector } from "react-redux";
 const Navbar = ({ selectedComponent }) => {
   const user = useSelector((state) => state.user.user);
   return (
-    <div className="flex p-4 justify-between w-full ">
+    <div className="flex p-2  items-center justify-between w-full ">
       <div className="text-4xl ml-2">
         <p className="amatic-sc-bold">
           {selectedComponent.charAt(0).toUpperCase() +
             selectedComponent.slice(1)}
         </p>
       </div>
-      <div className="bg-gray-100 hover:bg-gray-50 duration-150 rounded-xl flex p-2 gap-2 items-center group">
-        <GoSearch />
-        <input
-          className="bg-gray-100 outline-none group-hover:bg-gray-50 duration-150 focus:outline-none"
-          placeholder="Search for notes"
-        />
+      <div className="">
+        <img className="w-16 h-16" src="/tlogo.jpg"></img>
       </div>
 
       <div className="flex text-base items-center gap-3 mr-2 font-semibold">

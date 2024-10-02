@@ -17,7 +17,7 @@
   display: none;
 }
 .scrollbar-hide {
-  -ms-overflow-style: none; 
+  -ms-overflow-style: none;  
   scrollbar-width: none;  
 }
 

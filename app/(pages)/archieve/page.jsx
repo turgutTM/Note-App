@@ -75,7 +75,7 @@ const Archieve = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-10">
+    <div className="h-full bg-gray-50 p-10">
       {loading ? (
         <div className="flex justify-center items-center h-full">
           <ClipLoader color="#000" loading={loading} size={50} />

@@ -20,6 +20,12 @@ export const POST = async (req) => {
       return new NextResponse("Note not found", { status: 404 });
     }
 
+    if (note.folderId.length > 0 && !note.folderId.includes(folderId)) {
+      return new NextResponse("Note is already in another folder", {
+        status: 400,
+      });
+    }
+
     if (!note.folderId.includes(folderId)) {
       note.folderId.push(folderId);
       await note.save();

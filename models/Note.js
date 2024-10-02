@@ -10,6 +10,7 @@ const NoteSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Folder",
+        default: [],
       },
     ],
     title: {

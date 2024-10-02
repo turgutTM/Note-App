@@ -8,7 +8,7 @@ export const GET = async (req, { params }) => {
 
     const { folderId } = params;
     console.log(folderId);
-    
+
     if (!folderId) {
       return new NextResponse("Folder ID is required", { status: 400 });
     }
@@ -16,9 +16,7 @@ export const GET = async (req, { params }) => {
     const notes = await Note.find({ folderId }).sort({ createdAt: -1 });
 
     if (notes.length === 0) {
-      return new NextResponse("No notes found for this folder", {
-        status: 404,
-      });
+      return new NextResponse(JSON.stringify([]), { status: 200 });
     }
 
     return new NextResponse(JSON.stringify(notes), { status: 200 });

@@ -74,8 +74,8 @@ const Trash = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-10">
-      <ToastContainer /> {/* ToastContainer burada */}
+    <div className="h-full bg-gray-50 p-10">
+      <ToastContainer />
       {loading ? (
         <div className="flex justify-center items-center h-full">
           <ClipLoader color="#000" loading={loading} size={50} />
