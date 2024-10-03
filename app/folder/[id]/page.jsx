@@ -57,7 +57,7 @@ const Folder = () => {
         }),
       });
 
-      if (response.ok) {  
+      if (response.ok) {
         fetchFolderNotes();
         handleCloseNoteView();
       } else {
@@ -67,7 +67,6 @@ const Folder = () => {
       console.error("Not güncellerken hata oluştu:", error);
     }
   };
-
 
   const fetchFolder = async () => {
     try {
@@ -161,7 +160,7 @@ const Folder = () => {
 
   return (
     <div className="min-h-screen p-10">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto ">
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center tracking-wide">
           Notes in <span className="text-indigo-600">{folderName}</span>
         </h1>
@@ -171,7 +170,7 @@ const Folder = () => {
               <div
                 key={note._id}
                 onClick={() => handleViewNote(note)}
-                className="bg-white p-6 rounded-lg shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-105"
+                className="bg-white cursor-pointer p-6 rounded-lg shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-105"
               >
                 <div className="flex justify-between">
                   <h3 className="font-semibold text-xl text-gray-900 mb-3">
